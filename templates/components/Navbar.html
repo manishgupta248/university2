@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navbar</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="bg-[#800000] p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="/" class="text-xl text-white font-semibold">University ERP</a>
+            <!-- Company Name and Links -->
+            <div class="text-white">
+                <a href="{% url 'home' %}" class="mr-4">Home</a>
+                <a href="/" class="mr-4">About</a>
+                <a href="/" class="mr-4">Contact</a>
+            </div>
+            <!-- User Options -->
+            <div class="text-white">
+                {% if user.is_authenticated %}
+                    <span class="mr-4">Welcome, {{ user.first_name }}</span>
+                    <a href="{% url 'account_logout' %}" class="mr-4">Logout</a>
+                    <a href="{% url 'user_update' user.id %}" class="mr-4">Update Profile</a>
+                {% else %}
+                    <a href="{% url 'account_login' %}" class="mr-4">Login</a>
+                    <a href="{% url 'account_signup' %}" class="mr-4">Sign Up</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+</body>
+</html>

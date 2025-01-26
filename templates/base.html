@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %} {% endblock title %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="flex flex-col min-h-screen"> 
+    <!--NavBar Component-->
+    {% include "components/Navbar.html" %}
+    <div class="flex flex-1"> 
+
+        <!--Left Sidebar-->
+
+            {% include "components/Sidebar.html" %}
+   
+    <!--End Left Sidebar-->
+    
+    <!--Main Page Section-->
+        <div class="flex-1 p-4">
+            <main>
+                {% block content %}
+                {% endblock %}
+            </main>
+        </div>
+<!--End of Main Page Section-->
+        <!--Right Sidebar-->
+        <div class="w-64  p-4 border-l border-gray-100">
+            {% include "components/RightSidebar.html" %}
+        </div>
+<!---End of Right Sidebar-->
+    </div>
+    <!--Footer Section-->
+        <div>
+            {% include "components/Footer.html" %}
+        </div>
+        
+
+
+</body>
+</html>
