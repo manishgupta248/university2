@@ -4,13 +4,15 @@
 
 {% block content %}
 <div class="flex-1">
-
+<h1 class="text-xl text-red-900 font-bold mt-6 mb-4">Course Management</h1>
+<hr class="border-t-2 border-[#800000] my-2">
 <!-- Create/Update Form -->
-<h2 class="text-xl text-red-900 font-semibold mt-8 mb-4">{% if edit_course %}Edit{% else %}Create{% endif %} Course</h2>
-<form method="POST" class="bg-white p-4 ">
+<h2 class="text-xl text-red-900 font-semibold mt-4 mb-1">{% if edit_course %}Edit{% else %}Create{% endif %} Course</h2>
+<form method="POST" class="bg-white p-2 ">
     {% csrf_token %}
 
  <!-- Name -->
+ <div class="grid md:grid-cols-2 md:gap-4">
         <div class="mb-4">
             <label for="id_name" class="block mb-2 font-medium text-gray-900 dark:text-white">Course Name</label>
             <input type="text" name="name" id="id_name" class="bg-gray-50 border border-gray-900 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" value="{{ form.name.value }}">
@@ -18,9 +20,7 @@
                 <div class="text-red-600 text-sm">{{ form.name.errors }}</div>
             {% endif %}
         </div>
-
 <!-- Code -->
-        <div class="grid md:grid-cols-4 md:gap-6">
         <div class="mb-4">
                 <label for="id_code" class="block mb-2 font-medium text-gray-900 dark:text-white">Course Code</label>
                 <input type="text" name="code" id="id_code" class="bg-gray-50 border border-gray-900 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" value="{{ form.code.value }}">
@@ -28,8 +28,9 @@
                     <div class="text-red-600 text-sm">{{ form.code.errors }}</div>
                 {% endif %}
         </div>
-
-<!-- Category -->       
+    </div>
+<!-- Category --> 
+    <div class="grid md:grid-cols-4 md:gap-4">      
         <div class="mb-4">
             <label for="category" class="block mb-2 font-medium text-gray-900 dark:text-white">Cetegory </label>
             <select name="category" id="category" class="bg-gray-50 border border-gray-900 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
@@ -83,28 +84,62 @@
         </div>
         <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md mt-2">{% if edit_course %}Update{% else %}Create{% endif %}</button>
     </form>
-{% comment %} <!-- Import and Export Section -->
-<div class="flex justify-between items-center mt-6">
-    <form method="POST" enctype="multipart/form-data">
+    <script>
+        $(document).ready(function() {
+          $('#courseForm').submit(function(event) {
+            event.preventDefault();
+            
+            var formData = new FormData(this);
+            $.ajax({
+              type: 'POST',
+              url: window.location.pathname,
+              data: formData,
+              processData: false,
+              contentType: false,
+              success: function(response) {
+                // Handle successful response
+                alert('Course saved successfully!');
+                // Optionally reload the page or update the list dynamically
+                location.reload();
+              },
+              error: function(response) {
+                // Handle error response
+                alert('Failed to save the course. Please try again.');
+              }
+            });
+          });
+        });
+      </script>
+    <!-- Import and Export Section -->
+    <div class="flex justify-between items-center mt-6">
+        <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         <input type="file" name="import_file" accept=".csv, .xls, .xlsx" class="mb-2">
-        <button type="submit" formaction="{% url 'admin:academic_course_import' %}" class="bg-green-600 text-white px-4 py-2 rounded-md">Import</button>
-    </form>
-    <a href="{% url 'admin:academic_course_export' %}" class="bg-blue-600 text-white px-4 py-2 rounded-md">Export to Excel</a>
-</div> {% endcomment %}
+        <button type="submit" formaction="{% url 'course_import' %}" class="bg-green-600 text-white px-4 py-2 rounded-md">Import</button>
+        </form>
+        <a href="{% url 'course_export' %}" class="bg-blue-600 text-white px-4 py-2 rounded-md">Export to Excel</a>
+    </div>
+
 <!-- List View Section -->
 <hr class="border-t-2 border-[#800000] my-3">
+  <!-- Search Form -->
+  <h2 class="text-xl text-red-900 font-semibold ">Search Courses</h2>
+  <form method="GET" class="bg-white p-4">
+    <input type="text" name="q" class="bg-gray-50 border border-gray-900 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Search..." value="{{ query }}">
+    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md mt-2">Search</button>
+  </form>
+
 <h2 class="text-xl text-red-900 font-semibold my-3 mb-4">Courses List</h2>   
 <table class="min-w-full bg-white shadow-md border border-[#800000] rounded-lg">
     <thead>
         <tr class="bg-[#800000] text-white font-semibold  " >
             <th class="px-4 py-2  border border-gray-900">S.No</th>
-            <th class="px-4 py-2  border border-gray-900">Course Code</th>
-            <th class="px-4 py-2  border border-gray-900">Name</th>
-            <th class="px-4 py-2  border border-gray-900">Category</th>
-            <th class="px-4 py-2  border border-gray-900">Type</th>
-            <th class="px-4 py-2  border border-gray-900">CBCS Category</th>
-            <th class="px-4 py-2  border border-gray-900">Credits</th>
+            <th class="px-4 py-2  border border-gray-900"><a href="?sort_by=code" class=" font-medium text-blue-600 dark:text-blue-500 hover:underline">Course Code</th>
+            <th class="px-4 py-2  border border-gray-900"><a href="?sort_by=name" class=" font-medium text-blue-600 dark:text-blue-500 hover:underline">Name</th>
+            <th class="px-4 py-2  border border-gray-900"><a href="?sort_by=category" class=" font-medium text-blue-600 dark:text-blue-500 hover:underline">Category</th>
+            <th class="px-4 py-2  border border-gray-900"><a href="?sort_by=type" class=" font-medium text-blue-600 dark:text-blue-500 hover:underline">Type</th>
+            <th class="px-4 py-2  border border-gray-900"><a href="?sort_by=cbcs_category" class=" font-medium text-blue-600 dark:text-blue-500 hover:underline">CBCS Category</th>
+            <th class="px-4 py-2  border border-gray-900"><a href="?sort_by=maximum_credit" class=" font-medium text-blue-600 dark:text-blue-500 hover:underline">Credits</th>
             <th class="px-4 py-2  border border-gray-900">Actions</th>
         </tr>
     </thead>
@@ -119,6 +154,7 @@
             <td class="px-4 py-2 border border-[#800000]">{{ course.cbcs_category }}</td>
             <td class="px-4 py-2 border border-[#800000]">{{ course.maximum_credit }}</td>
             <td class="px-4 py-2 border border-[#800000]">
+                <a href="#" class="text-blue-600 hover:underline mr-2" data-course-id="{{ course.id }}" onclick="openCourseModal(event)">View</a> 
                 <a href="{% url 'course_update' course.id %}" class="text-yellow-600 hover:underline mr-2">Edit</a> |
                 <a href="{% url 'course_delete' course.id %}" class="text-yellow-600 hover:underline mr-2">Delete</a>
             </td>
@@ -126,54 +162,71 @@
         {% endfor %}
     </tbody>
 </table> 
-<!-- Pagination Controls -->
 <!-- Pagination Section -->
-<div class="mt-4 flex justify-center">
-    <nav class="inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+<div class="mt-4 flex justify-center bg-blue-800">
+    <nav class="inline-flex rounded-md bg-blue-800 shadow-sm -space-x-px" aria-label="Pagination">
         {% if page_obj.has_previous %}
-        <a href="?page=1" class="px-4 py-2 border border-gray-300 bg-white text-gray-500 hover:bg-gray-50 rounded-l-md">
-            First
-        </a>
-        <a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 border border-gray-300 bg-white text-gray-500 hover:bg-gray-50">
-            Previous
-        </a>
+         <a href="?page=1" class="px-4  py-2 border border-gray-300 bg-blue-800  text-white hover:bg-gray-50 rounded-l-md">First</a>
+            <a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 border border-gray-300 bg-blue-800  text-white hover:bg-gray-50">Previous</a>
         {% else %}
-        <span class="px-4 py-2 border border-gray-300 bg-gray-200 text-gray-400 cursor-not-allowed rounded-l-md">
-            First
-        </span>
-        <span class="px-4 py-2 border border-gray-300 bg-gray-200 text-gray-400 cursor-not-allowed">
-            Previous
-        </span>
+            <span class="px-4 py-2 border border-gray-300 bg-blue-800 text-white cursor-not-allowed rounded-l-md">First</span>
+            <span class="px-4 py-2 border border-gray-300 bg-blue-800  text-whitecursor-not-allowed"> Previous</span>
         {% endif %}
         
         {% for num in page_obj.paginator.page_range %}
-        {% if page_obj.number == num %}
-        <span class="px-4 py-2 border border-gray-300 bg-blue-100 text-blue-600 font-bold">
-            {{ num }}
-        </span>
+         {% if page_obj.number == num %}
+             <span class="px-4 py-2 border border-gray-300 bg-blue-800 text-white font-bold">{{ num }} </span>
         {% else %}
-        <a href="?page={{ num }}" class="px-4 py-2 border border-gray-300 bg-white text-gray-500 hover:bg-gray-50">
-            {{ num }}
-        </a>
+            <a href="?page={{ num }}" class="px-4 py-2 border border-gray-300 bg-blue-800 text-white hover:bg-gray-50">{{ num }} </a>
         {% endif %}
         {% endfor %}
-        
         {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 border border-gray-300 bg-white text-gray-500 hover:bg-gray-50">
-            Next
-        </a>
-        <a href="?page={{ page_obj.paginator.num_pages }}" class="px-4 py-2 border border-gray-300 bg-white text-gray-500 hover:bg-gray-50 rounded-r-md">
-            Last
-        </a>
+            <a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 border border-gray-300 bg-blue-800 text-white hover:bg-gray-50">Next </a>
+            <a href="?page={{ page_obj.paginator.num_pages }}" class="px-4 py-2 border bg-blue-800  text-white hover:bg-gray-50 rounded-r-md">Last</a>
         {% else %}
-        <span class="px-4 py-2 border border-gray-300 bg-gray-200 text-gray-400 cursor-not-allowed">
-            Next
-        </span>
-        <span class="px-4 py-2 border border-gray-300 bg-gray-200 text-gray-400 cursor-not-allowed rounded-r-md">
-            Last
-        </span>
+            <span class="px-4 py-2 border border-gray-300 bg-blue-800  text-white cursor-not-allowed">Next</span>
+        <span class="px-4 py-2 border border-gray-300 bg-blue-800  text-white cursor-not-allowed rounded-r-md">Last</span>
         {% endif %}
     </nav>
 </div>
-</div>
+
+<!-- Course Details Modal -->
+<div id="courseModal" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 hidden">
+    <div class="bg-white rounded-lg shadow-lg max-w-lg w-full">
+      <div class="border-b px-4 py-2 flex justify-between items-center">
+        <h3 class="text-xl font-semibold">Course Details</h3>
+        <button onclick="closeCourseModal()" class="text-gray-600 hover:text-gray-900">&times;</button>
+      </div>
+      <div class="p-4">
+        <!-- Course details will be loaded here dynamically -->
+      </div>
+      <div class="border-t px-4 py-2 flex justify-end">
+        <button onclick="closeCourseModal()" class="bg-red-600 text-white px-4 py-2 rounded">Close</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+    function openCourseModal(event) {
+      event.preventDefault();
+      var courseId = event.target.getAttribute('data-course-id');
+      
+      $.ajax({
+        url: '/academic/course-detail/' + courseId + '/',
+        method: 'GET',
+        success: function(data) {
+          var modal = $('#courseModal');
+          modal.find('.p-4').html(data);
+          modal.removeClass('hidden');
+        },
+        error: function() {
+          alert('Failed to load course details.');
+        }
+      });
+    }
+  
+    function closeCourseModal() {
+      $('#courseModal').addClass('hidden');
+    }
+  </script>
 {% endblock content %}
